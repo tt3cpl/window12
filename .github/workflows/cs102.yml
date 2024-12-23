@@ -24,22 +24,23 @@ jobs:
         run: pytest --cov=app tests/
 
   deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Set up SSH Key
-        run: |
-          echo "${{ secrets.DEPLOY_KEY }}" > deploy_key.pem
-          chmod 600 deploy_key.pem
-
-      - name: Deploy to Server
-        run: |
-          ssh -i deploy_key.pem user@your-server-domain.com <<EOF
-          cd /var/www/flask_app
-          git pull origin main
-          pip install --no-cache-dir -r requirements.txt
-          systemctl restart flask_app
-          EOF
+            needs: build
+            runs-on: ubuntu-latest
+            steps:
+              - name: Checkout Code
+                uses: actions/checkout@v3
+          
+              - name: Set up SSH Key
+                run: |
+                  echo "${{ secrets.DEPLOY_KEY }}" > deploy_key.pem
+                  chmod 600 deploy_key.pem
+          
+              - name: Deploy to Server
+                run: |
+                  ssh -T -i deploy_key.pem user@192.168.1.100 <<EOF
+                  cd /var/www/flask_app
+                  git pull origin main
+                  pip install --no-cache-dir -r requirements.txt
+                  systemctl restart flask_app
+                  EOF
+          
