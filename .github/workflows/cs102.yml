@@ -34,9 +34,14 @@ jobs:
         env:
           DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
         run: |
-          ssh -i $DEPLOY_KEY user@server <<EOF
-          cd /var/www/flask_app
-          git pull origin main
-          pip install --no-cache-dir -r requirements.txt
-          systemctl restart flask_app
-          EOF
+        # Сохраняем приватный ключ в файл deploy_key
+        echo "$DEPLOY_KEY" > deploy_key
+        # Устанавливаем правильные права на файл
+        chmod 600 deploy_key
+        # Подключаемся через SSH с использованием ключа
+        ssh -i deploy_key user@your-server-address <<EOF
+        cd /var/www/flask_app
+        git pull origin main
+        pip install --no-cache-dir -r requirements.txt
+        systemctl restart flask_app
+        EOF
