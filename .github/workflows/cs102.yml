@@ -30,11 +30,14 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Deploy to Server
-        env:
-          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+      - name: Set up SSH Key
         run: |
-          ssh -i $DEPLOY_KEY user@server <<EOF
+          echo "${{ secrets.DEPLOY_KEY }}" > deploy_key.pem
+          chmod 600 deploy_key.pem
+
+      - name: Deploy to Server
+        run: |
+          ssh -i deploy_key.pem user@your-server-domain.com <<EOF
           cd /var/www/flask_app
           git pull origin main
           pip install --no-cache-dir -r requirements.txt
